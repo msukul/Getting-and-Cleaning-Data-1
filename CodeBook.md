@@ -1,9 +1,11 @@
 Code Book
 ========
 
-This is a code book that describes the variables, data, and any transformations or work that you performed to clean up the data.
 
 
+Collection
+
+Raw data are obtained from UCI Machine Learning repository:
 
 
 
@@ -12,13 +14,13 @@ The sensor signals (accelerometer and gyroscope) were pre-processed by applying 
 ##### Attribute Information:
 
 For each record in the dataset it is provided:
-* Triaxial acceleration from the accelerometer (total acceleration) and the estimated body acceleration.
-* Triaxial Angular velocity from the gyroscope.
+* total acceleration and the estimated body acceleration.
+*  velocity from the gyroscope.
 * A 561-feature vector with time and frequency domain variables.
-* Its activity label.
-* An identifier of the subject who carried out the experiment. 
+* activity label.
+*  identifier of the subject who carried out the experiment. 
 
-See Readme file into 'UCI HAR Dataset' for more information.
+
 
 
 Raw Data transformation

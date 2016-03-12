@@ -1,7 +1,7 @@
 require(plyr)
 
 #Utils: function add suffix
-addSuffix<- function(x, suffix) {
+aSuf<- function(x, suffix) {
   if (!(x %in% c("Subject","Activity"))) {
     paste(x,suffix, sep="")
   }
@@ -11,57 +11,57 @@ addSuffix<- function(x, suffix) {
 }
 
 #Get data
-pathfile<-file.path(getwd(),"UCI HAR Dataset")
+pathf<-file.path(getwd(),"UCI HAR Dataset")
 
-pathfiletest<-file.path(pathfile, "test")
-pathfiletrain<-file.path(pathfile, "train")
-  
-xtest<-read.table(file.path(pathfiletest,"X_test.txt"))
-ytest<-read.table(file.path(pathfiletest,"Y_test.txt"))
-subjecttest<-read.table(file.path(pathfiletest,"subject_test.txt"))
+test<-file.path(pathf, "test")
+train<-file.path(pathf, "train")
 
-xtrain<-read.table(file.path(pathfiletrain,"X_train.txt"))
-ytrain<-read.table(file.path(pathfiletrain,"Y_train.txt"))
-subjecttrain<-read.table(file.path(pathfiletrain,"subject_train.txt"))
+x<-read.table(file.path(test,"X_test.txt"))
+y<-read.table(file.path(test,"Y_test.txt"))
+subTest<-read.table(file.path(test,"subject_test.txt"))
+
+xt<-read.table(file.path(train,"X_train.txt"))
+yt<-read.table(file.path(train,"Y_train.txt"))
+subtrain<-read.table(file.path(train,"subject_train.txt"))
 
 #Get activity labels 
-activitylabels<-read.table(file.path(pathfile,
-                              			"activity_labels.txt"),
-                            col.names = c("Id", "Activity")
-                            )
+labels<-read.table(file.path(pathf,
+                                     "activity_labels.txt"),
+                           col.names = c("Id", "Activity")
+)
 
 #Get features labels
-featurelabels<-read.table(file.path(pathfile,
-                            		"features.txt"),
-                            colClasses = c("character")
-                           	)
+flabels<-read.table(file.path(pathf,
+                                    "features.txt"),
+                          colClasses = c("character")
+)
 
 #1.Merges the training and the test sets to create one data set.
-traindata<-cbind(cbind(xtrain, subjecttrain), ytrain)
-testdata<-cbind(cbind(xtest, subjecttest), ytest)
-sensordata<-rbind(traindata, testdata)
+datatrain<-cbind(cbind(xt, subtrain), yt)
+datatest<-cbind(cbind(x, subTest), y)
+sensor<-rbind(datatrain, datatest)
 
-sensorlabels<-rbind(rbind(featurelabels, c(562, "Subject")), c(563, "Id"))[,2]
-names(sensordata)<-sensorlabels
+slabels<-rbind(rbind(flabels, c(562, "Subject")), c(563, "Id"))[,2]
+names(sensor)<-slabels
 
 #2. Extracts only the measurements on the mean and standard deviation for each measurement.
-sensordatameanstd <- sensordata[,grepl("mean\\(\\)|std\\(\\)|Subject|Id", names(sensordata))]
+sensormeanstd <- sensor[,grepl("mean\\(\\)|std\\(\\)|Subject|Id", names(sensor))]
 
 #3. Uses descriptive activity names to name the activities in the data set
-sensordatameanstd <- join(sensordatameanstd, activitylabels, by = "Id", match = "first")
-sensordatameanstd <- sensordatameanstd[,-1]
+sensormeanstd <- join(sensormeanstd, labels, by = "Id", match = "first")
+sensormeanstd <- sensormeanstd[,-1]
 
 #4. Appropriately labels the data set with descriptive names.
-names(sensordatameanstd) <- gsub("([()])","",names(sensordatameanstd))
+names(sensormeanstd) <- gsub("([()])","",names(sensormeanstd))
 #norm names
-names(sensordatameanstd) <- make.names(names(sensordatameanstd))
+names(sensormeanstd) <- make.names(names(sensormeanstd))
 
 #5. From the data set in step 4, creates a second, independent tidy data set 
 # with the average of each variable for each activity and each subject 
-finaldata<-ddply(sensordatameanstd, c("Subject","Activity"), numcolwise(mean))
+fdata<-ddply(sensormeanstd, c("Subject","Activity"), numcolwise(mean))
 #improve column names
-finaldataheaders<-names(finaldata)
-finaldataheaders<-sapply(finaldataheaders, addSuffix, ".mean")
-names(finaldata)<-finaldataheaders
+fdataheaders<-names(fdata)
+fdataheaders<-sapply(fdataheaders, aSuf, ".mean")
+names(fdata)<-fdataheaders
 
-write.table(finaldata, file = "sensordata_avg_by_subject.txt", row.name=FALSE)
+write.table(fdata, file = "sensordataavgsubject.txt", row.name=FALSE)
